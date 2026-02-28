@@ -12,12 +12,12 @@ SRC_DIR	:= ./src
 ifeq ($(OS), Darwin)
 	SFML_DIR	:= /opt/homebrew/opt/sfml
 	CXX_FLAGS	:= -O3 -std=c++23 -Wno-unused-result -Wno-deprecated-declarations
-	INCLUDES	:= -I$(SRC_DIR) -I$(SRC_DIR)/imgui -I$(SFML_DIR)/include
+	INCLUDES	:= -I$(SRC_DIR) -I$(SRC_DIR)/imgui -I$(SRC_DIR)/imgui-sfml -I$(SFML_DIR)/include
 	LDFLAGS		:= -O3 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_DIR)/lib -framework OpenGL
 endif
 
 # the source files for the ecs game engine
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/imgui/*.cpp)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/imgui/*.cpp $(SRC_DIR)/imgui-sfml/*.cpp)
 OBJ_FILES := $(SRC_FILES:.cpp=.o)
 
 # Include dependency files
