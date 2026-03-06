@@ -1,0 +1,36 @@
+CXX := g++
+OUTPUT := sfmlgame.exe
+SRC_DIR := ./src
+BIN_DIR := ./bin
+OBJ_DIR := ./obj
+SFML_DIR := $(SRC_DIR)/SFML
+
+CXX_FLAGS := -O3 -std=c++23
+INCLUDES := -I$(SRC_DIR) -I$(SRC_DIR)/imgui -I$(SRC_DIR)/imgui-sfml -I$(SFML_DIR)/include 
+LDFLAGS := -L$(SFML_DIR)/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lopengl32
+
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/imgui/*.cpp $(SRC_DIR)/imgui-sfml/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+DEP_FILES := $(OBJ_FILES:.o=.d)
+
+-include $(DEP_FILES)
+
+all: $(BIN_DIR)/$(OUTPUT)
+
+$(BIN_DIR)/$(OUTPUT): $(OBJ_FILES) Makefile.win
+	@if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
+	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o $@
+	copy /Y "$(SFML_DIR)\bin\*.dll" "$(BIN_DIR)\" >nul
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CXX) $(CXX_FLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+
+clean:
+	if exist "$(OBJ_DIR)" rmdir /S /Q "$(OBJ_DIR)"
+	if exist "$(BIN_DIR)" rmdir /S /Q "$(BIN_DIR)"
+
+run: $(BIN_DIR)/$(OUTPUT)
+	$(BIN_DIR)\$(OUTPUT)
+
+.PHONY: all clean run
