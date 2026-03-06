@@ -56,6 +56,12 @@ else
 endif
 	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o $@
 
+ifeq ($(PLATFORM),WINDOWS)
+	copy /Y "$(SFML_DIR)\bin\*.dll" "$(BIN_DIR)\"
+endif
+
+
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 ifeq ($(PLATFORM),WINDOWS)
 	if not exist "$(dir $@)" mkdir "$(dir $@)"
