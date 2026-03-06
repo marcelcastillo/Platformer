@@ -3,14 +3,15 @@ SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
 OUTPUT := sfmlgame
-SFML_DIR := $(SRC_DIR)/SFML
 
 ifeq ($(OS),Windows_NT)
     PLATFORM := WINDOWS
+	SFML_DIR := $(SRC_DIR)/SFML
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Darwin)
         PLATFORM := DARWIN
+		SFML_DIR := /opt/homebrew/opt/sfml
     else
         PLATFORM := LINUX
     endif
