@@ -1,3 +1,22 @@
 .DS_STORE
-*.d
+bin/
+obj/
+
 *.o
+*.obj
+*.exe
+*.dll
+*.a
+*.lib
+*.so
+*.dylib
+
+# dependency files from -MMD
+*.d
+
+# ========================
+# SFML runtime copies
+# ========================
+
+# If you copy DLLs into bin for runtime
+bin/*.dll

@@ -22,6 +22,9 @@ int main(int argc, char* argv[])
     int min = 0;
     int max = 15;
 
+    const char* items[] = {"AAAA", "BBBB", "CCCC", "DDDD"};
+    static int item_index = 0;
+
     while (window.isOpen()) {
         while (auto event = window.pollEvent()) {
             ImGui::SFML::ProcessEvent(window, *event);  // Feed ImGui
@@ -32,7 +35,14 @@ int main(int argc, char* argv[])
 
         ImGui::Begin("Debug");
         ImGui::SliderInt("SomeInt", &intVar, min, max);
+        if (ImGui::Button("Button Text"))
+        {
+            // This Happens
+        }
+        ImGui::Combo("Combo", &item_index, items, IM_ARRAYSIZE(items));
         ImGui::End();
+
+
 
         window.clear();
         ImGui::SFML::Render(window);
