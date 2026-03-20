@@ -34,9 +34,10 @@ int main(int argc, char* argv[])
     float angle = static_cast<float>(rand()) / RAND_MAX * 2.0f * PI;
     float speed = 250.0f;
 
-    sf::Vector2f velocity(
-        std::cos(angle) * speed,
-        std::sin(angle) * speed
+    sf::Vector2f velocity;
+    sf::Vector2f direction(
+        std::cos(angle),
+        std::sin(angle)
     );
 
     sf::Clock deltaClock;
@@ -67,6 +68,7 @@ int main(int argc, char* argv[])
         ImGui::SFML::Update(window, dt);
 
         /* Move Shape */
+        velocity = direction * speed;
         shape.move(velocity * dt.asSeconds());
 
         // Bounce Logic
@@ -78,28 +80,28 @@ int main(int argc, char* argv[])
         if (pos.x <= 0.0f)
         {
             pos.x = 0.0f;
-            velocity.x = -velocity.x;
+            direction.x = -direction.x;
         }
         else if (pos.x + diameter >= WIDTH)
         {
             pos.x = WIDTH - diameter;
-            velocity.x = - velocity.x;
+            direction.x = - direction.x;
         }
 
         // Top / bottom walls
         if (pos.y <= 0.0f)
         {
             pos.y = 0.0f;
-            velocity.y = -velocity.y;
+            direction.y = -direction.y;
         }
         else if (pos.y + diameter >= HEIGHT)
         {
             pos.y = HEIGHT - diameter;
-            velocity.y = -velocity.y;
+            direction.y = -direction.y;
         }
 
         ImGui::Begin("Debug");
-        ImGui::SliderInt("SomeInt", &intVar, min, max);
+        ImGui::SliderFloat("Speed", &speed, 0.0f, 1000.0f);
         if (ImGui::Button("Button Text"))
         {
             // This Happens
@@ -111,8 +113,8 @@ int main(int argc, char* argv[])
 
 
         window.clear();
-        ImGui::SFML::Render(window);
         window.draw(shape);
+        ImGui::SFML::Render(window);
         window.display();
     }
     ImGui::SFML::Shutdown();
