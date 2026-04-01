@@ -6,6 +6,7 @@
 #include <tuple>
 #include <string>
 #include <utility>
+#include <SFML/Graphics.hpp>
 
 /* Vec2 class */
 class Vec2
@@ -14,35 +15,82 @@ public:
     float x = 0;
     float y = 0;
     
-    Vec2() {}
     Vec2(float xin, float yin)
         : x(xin), y(yin) {}
 
-    void print()
+    Vec2& add(const Vec2& v)
+    {
+        x += v.x;
+        y += v.y;
+        return *this;
+    }
+
+    Vec2& mult(float f)
+    {
+        x *= f;
+        y *= f;
+        return *this;
+    }
+
+    Vec2 operator + (const Vec2& v)
+    {
+        return Vec2(x + v.x, y + v.y);
+    }
+    Vec2 operator * (float f)
+    {
+        return Vec2(x * f, y * f);
+    }
+
+    void print() const
     {
         std::cout << x << " " << y << std::endl;
     }
 };
 
 /* Entities and Components */
-
 class Component
 {
-    public:
-        bool exists = false;
+public:
+    bool exists = false;
 };
 
-struct CTransform : public Component {};
-struct CLifespan  : public Component {};
-struct CInput     : public Component {};
-struct CBBox      : public Component {};
-struct CAnimation : public Component {};
-struct CGravity   : public Component {};
-struct CState     : public Component {};
+class CTransform : public Component {
+    public:
+        Vec2 pos = {0,0};
+        Vec2 velocity = {0,0};
+        CTransform() {}
+        CTransform(const Vec2& p, const Vec2& v)
+            : pos(p), velocity(v) {}
+};
+class CShape : public Component{
+    public:
+        sf::CircleShape shape;
+        CShape() {}
+        CShape(const float radius, const sf::Color& color)
+            : shape(radius)
+            {
+                shape.setFillColor(color);
+            }
+};
+class CLifespan  : public Component {
+    public:
+        int totalLifespan = 0;
+        int remainingLifespan = 0;
+        CLifespan() {}
+        CLifespan(int tls)
+            : totalLifespan(tls), remainingLifespan(tls) {}
+};
+class CInput     : public Component {};
+class CBBox      : public Component {};
+class CAnimation : public Component {};
+class CGravity   : public Component {};
+class CState     : public Component {};
 
+/* Component Tuple */
 using ComponentTuple = std::tuple<
     CTransform,
     CLifespan,
+    CShape,
     CInput,
     CBBox,
     CAnimation,
@@ -111,6 +159,25 @@ public:
     {
         return m_tag;
     }
+};
+
+/* Entity Manager */
+
+using EntityVec = std::vector <std::shared_ptr<Entity>>;
+using EntityMap = std::map    <std::string, EntityVec>;
+
+class EntityManager
+{
+    EntityVec   m_entities;
+    EntityMap   m_entityMap;
+    size_t      m_totalEntities = 0;
+
+public:
+    EntityManager();
+    std::shared_ptr<Entity> addEntity(const std::string& tag);
+    EntityVec& getEntities();
+    EntityVec& getEntities(const std::string& tag);
+
 };
 
 /* End Entities */
