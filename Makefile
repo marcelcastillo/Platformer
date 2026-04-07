@@ -6,14 +6,21 @@ CXX		:= g++
 OUTPUT	:= sfmlgame
 OS		:= $(shell uname)
 SRC_DIR	:= ./src
+BIN_DIR	:= ./bin
 
 # mac os compiler / linker flags
 
 ifeq ($(OS), Darwin)
-	SFML_DIR	:= /opt/homebrew/opt/sfml
-	CXX_FLAGS	:= -O3 -std=c++23 -Wno-unused-result -Wno-deprecated-declarations
+	SFML_DIR	:= $(firstword $(wildcard /opt/homebrew/opt/sfml /usr/local/opt/sfml))
+	CXX_FLAGS	:= -O3 -std=c++2b -Wno-unused-result -Wno-deprecated-declarations
 	INCLUDES	:= -I$(SRC_DIR) -I$(SRC_DIR)/imgui -I$(SRC_DIR)/imgui-sfml -I$(SFML_DIR)/include
 	LDFLAGS		:= -O3 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_DIR)/lib -framework OpenGL
+ifeq ($(strip $(SFML_DIR)),)
+$(error SFML Homebrew prefix not found. Install with 'brew install sfml')
+endif
+ifeq ($(wildcard $(SFML_DIR)/include/SFML/Graphics.hpp),)
+$(error SFML headers not found at $(SFML_DIR). Fix Homebrew permissions and run 'brew install sfml')
+endif
 endif
 
 # the source files for the ecs game engine
@@ -28,8 +35,11 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 all: $(OUTPUT)
 
 # Define the main executable requirements/commands
-$(OUTPUT): $(OBJ_FILES) Makefile
-	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o ./bin/$@
+$(OUTPUT): $(OBJ_FILES) Makefile | $(BIN_DIR)
+	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o $(BIN_DIR)/$@
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR) #missing mkdir command to create the bin directory
 
 # Specifies how the object files are compiled from cpp files
 %.o: %.cpp
@@ -37,8 +47,9 @@ $(OUTPUT): $(OBJ_FILES) Makefile
 
 # 'make clean' will remove all intermediate build files
 clean:
-	rm -f $(OBJ_FILES) $(DEP_FILES) ./bin/$(OUTPUT)
+	rm -f $(OBJ_FILES) $(DEP_FILES) $(BIN_DIR)/$(OUTPUT)
 
 # 'make run' will compile and run the program
 run: $(OUTPUT)
-	cd bin && ./$(OUTPUT) && cd ..
+	cd $(BIN_DIR) && ./$(OUTPUT) && cd ..
+	
