@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <SFML/Graphics.hpp>
+#include <map>
 
 /* Vec2 class */
 class Vec2
@@ -107,7 +108,9 @@ class Entity
 
 public:
     Entity() = default;
-
+    Entity(const std::string& tag, size_t id)
+        : m_id(id), m_tag(tag)
+    {}
     template <typename T, typename... TArgs>    // Generate overloaded functions
     T& add(TArgs&&... mArgs)
     {   
